@@ -7,18 +7,18 @@ type state = {
   x: int,
   y: int,
   direction: direction,
-  table: table,
 };
 
 module Robot = {
 
   type robot = {
-    state: ref(option(state))
+    state: ref(option(state)),
+    table: table,
   };
 
   let place = (prevState: option(state), x: int, y: int, direction: direction, table: table): option(state) =>
     switch(Table.isInside(table, x, y)) {
-    | true => Some({ x: x, y: y, direction: direction, table: table });
+    | true => Some({ x: x, y: y, direction: direction });
     | false => prevState;
     };
 
@@ -38,7 +38,7 @@ module Robot = {
     | EAST => { ...prevState, direction: SOUTH }
     };
 
-  let move = (prevState: state): state => {
+  let move = (prevState: state, table: table): state => {
     let nextState = switch(prevState.direction) {
       | NORTH => { ...prevState, y: prevState.y + 1 }
       | SOUTH => { ...prevState, y: prevState.y - 1 }
@@ -46,7 +46,7 @@ module Robot = {
       | EAST => { ...prevState, x: prevState.x + 1 }
       };
     
-    switch(Table.isInside(nextState.table, nextState.x, nextState.y)) {
+    switch(Table.isInside(table, nextState.x, nextState.y)) {
       | true => nextState;
       | false => prevState;
       };
@@ -64,13 +64,12 @@ module Robot = {
       | (_, REPORT) => report(state)
       | (Some(prevState), LEFT) => Some(left(prevState))
       | (Some(prevState), RIGHT) => Some(right(prevState))
-      | (Some(prevState), MOVE) => Some(move(prevState))
+      | (Some(prevState), MOVE) => Some(move(prevState, table))
       | _ => state
       };
 
-  let play = (table: table, robot: robot, actions: list('action)): option(state) => {
-    List.fold_left(reducer(table), robot.state^, actions)
-  }
+  let play = (robot: robot, actions: list('action)): option(state) =>
+    List.fold_left(reducer(robot.table), robot.state^, actions);
 
-  let create = (): robot => { state: ref(None) };
+  let create = (table: table): robot => { state: ref(None), table: table };
 }

@@ -2,9 +2,9 @@ open Table;
 open Robot;
 
 let table = Table.create(5);
-let robot = Robot.create();
+let robot = Robot.create(table);
 
-Robot.play(table, robot, [
+Robot.play(robot, [
   PLACE(1, 2, NORTH),
   RIGHT,
   MOVE,
