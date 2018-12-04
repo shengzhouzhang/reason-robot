@@ -3,25 +3,23 @@ open Table;
 type direction = NORTH | SOUTH | WEST | EAST;
 type action = PLACE(int, int, direction) | LEFT | RIGHT | MOVE | REPORT;
 
-module Robot = {
+type state = {
+  x: int,
+  y: int,
+  direction: direction,
+  table: table,
+};
 
-  type state = {
-    x: int,
-    y: int,
-    direction: direction,
-    table: table,
-  };
+module Robot = {
 
   type robot = {
     state: ref(option(state))
   };
 
-  let create = (): robot => { state: ref(None) };
-
-  let place = (x: int, y: int, direction: direction, table: table): option(state) =>
+  let place = (prevState: option(state), x: int, y: int, direction: direction, table: table): option(state) =>
     switch(Table.isInside(table, x, y)) {
     | true => Some({ x: x, y: y, direction: direction, table: table });
-    | false => None;
+    | false => prevState;
     };
 
   let left = (prevState: state): state => 
@@ -62,7 +60,7 @@ module Robot = {
   let reducer = (table: table) => 
     (state: option(state), action: action): option(state) =>
       switch (state, action) {
-      | (_, PLACE(x, y, direction)) => place(x, y, direction, table)
+      | (_, PLACE(x, y, direction)) => place(state, x, y, direction, table)
       | (_, REPORT) => report(state)
       | (Some(prevState), LEFT) => Some(left(prevState))
       | (Some(prevState), RIGHT) => Some(right(prevState))
@@ -73,4 +71,6 @@ module Robot = {
   let play = (table: table, robot: robot, actions: list('action)): option(state) => {
     List.fold_left(reducer(table), robot.state^, actions)
   }
+
+  let create = (): robot => { state: ref(None) };
 }
