@@ -1,6 +1,3 @@
-open Table;
-open Robot;
-
 let table = Table.create(5);
 let robot = Robot.create(table);
 

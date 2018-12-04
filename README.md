@@ -2,21 +2,25 @@
 
 This is a reasonml implementation of toy robot. Partially done. The purpose is only to learn reasonml.
 
-# install
+# Install
 ```
 yarn install
 ```
 
-# build
+# Build
 ```
 yarn build
 ```
 
-# run
+# Test
+```
+yarn test
+```
+
+# Run
 ```
 node src/console.bs.js
 ```
 
-# todos
-- Spike how to do unit testing with reasonml and cover with unit tests
+# Todos
 - Read robot commands from files
